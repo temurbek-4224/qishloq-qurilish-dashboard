@@ -3,6 +3,7 @@ import Layout from "./components/Layout";
 import Projects from "./pages/Projects";
 import Dashboard from "./pages/Dashboard";
 import RegionProjects from "./pages/RegionProjects";
+import ProjectDetail from "./pages/ProjectDetail"; // 👈 YANGI
 
 export default function App() {
   return (
@@ -15,6 +16,7 @@ export default function App() {
             path="/loyihalar/:region"
             element={<RegionProjects />}
           />
+          <Route path="/projects/:id" element={<ProjectDetail />} /> 
         </Routes>
       </Layout>
     </BrowserRouter>

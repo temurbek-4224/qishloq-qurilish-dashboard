@@ -1,4 +1,5 @@
 import { formatMoney, calcQolganSumma } from "../utils/helpers";
+import { useNavigate } from "react-router-dom";
 
 
 const statusStyles = {
@@ -9,6 +10,9 @@ const statusStyles = {
 };
 
 export default function ProjectsTable({ projects }) {
+
+    const navigate = useNavigate();
+
     if (!projects.length) {
         return (
             <div className="text-center text-gray-500 py-10">
@@ -38,7 +42,8 @@ export default function ProjectsTable({ projects }) {
                         {projects.map((p, index) => (
                             <tr
                                 key={p.id || index}
-                                className="hover:bg-indigo-50 transition-colors"
+                                className="hover:bg-gray-50 cursor-pointer"
+                                onClick={() => navigate(`/projects/${p.id}`)}
                             >
                                 <td className="px-4 py-3">{index + 1}</td>
                                 <td className="px-4 py-3 max-w-[420px]">
