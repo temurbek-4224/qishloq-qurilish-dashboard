@@ -1,6 +1,10 @@
 import { useEffect, useState } from "react";
 import { getProjects } from "../services/api";
 import { formatMoney } from "../utils/helpers";
+import { calculateProjectsStats } from "../utils/projectsStats";
+import SummaryCards from "../components/SummaryCards";
+import RegionCards from "../components/RegionCards";
+
 
 const statusStyles = {
   Shartnoma: "bg-blue-100 text-blue-700",
@@ -13,10 +17,16 @@ export default function Projects() {
   const [projects, setProjects] = useState([]);
   const [search, setSearch] = useState("");
   const [status, setStatus] = useState("");
+  const [selectedRegion, setSelectedRegion] = useState("ALL");
+
 
   useEffect(() => {
     getProjects().then(setProjects);
   }, []);
+
+  const stats = calculateProjectsStats(projects);
+
+  // console.log(stats);
 
   const filtered = projects.filter((p) => {
     const byName = p.loyiha_nomi
@@ -28,6 +38,14 @@ export default function Projects() {
     return byName && byStatus;
   });
 
+  const filteredProjects =
+    selectedRegion === "ALL"
+      ? projects
+      : projects.filter(p => p.viloyat === selectedRegion);
+
+  const statsFiltered = calculateProjectsStats(filteredProjects);
+
+
   return (
     <div className="p-6 bg-gray-100 min-h-screen">
       {/* HEADER */}
@@ -36,7 +54,16 @@ export default function Projects() {
           Loyihalar
         </h1>
 
-        <div className="flex flex-col md:flex-row gap-3">
+        {/* 🔥 1. SUMMARY CARDLAR — ENG TEPADA */}
+        <SummaryCards summary={stats.summary} />
+        <RegionCards
+          regions={stats.regions}
+          selected={selectedRegion}
+          onSelect={setSelectedRegion}
+        />
+
+        {/* search + filter */}
+        {/* <div className="flex flex-col md:flex-row gap-3">
           <input
             type="text"
             placeholder="🔍 Loyiha nomi bo‘yicha qidirish..."
@@ -58,11 +85,11 @@ export default function Projects() {
             <option value="Expertiza">Expertiza</option>
             <option value="Topshirildi">Topshirildi</option>
           </select>
-        </div>
+        </div> */}
       </div>
 
       {/* TABLE CARD */}
-      <div className="bg-white rounded-2xl shadow border border-gray-200 overflow-hidden">
+      {/* <div className="bg-white rounded-2xl shadow border border-gray-200 overflow-hidden">
         <div className="overflow-x-auto">
           <table className="min-w-full text-sm">
             <thead className="bg-gray-100 text-gray-600 sticky top-0">
@@ -115,20 +142,18 @@ export default function Projects() {
                     </td>
 
                     <td
-                      className={`px-4 py-3 text-right font-semibold ${
-                        qolgan > 0
-                          ? "text-red-600"
-                          : "text-gray-400"
-                      }`}
+                      className={`px-4 py-3 text-right font-semibold ${qolgan > 0
+                        ? "text-red-600"
+                        : "text-gray-400"
+                        }`}
                     >
                       {formatMoney(qolgan)}
                     </td>
 
                     <td className="px-4 py-3 text-center">
                       <span
-                        className={`px-3 py-1 rounded-full text-xs font-semibold ${
-                          statusStyles[p.object_holati]
-                        }`}
+                        className={`px-3 py-1 rounded-full text-xs font-semibold ${statusStyles[p.object_holati]
+                          }`}
                       >
                         {p.object_holati}
                       </span>
@@ -139,7 +164,7 @@ export default function Projects() {
             </tbody>
           </table>
         </div>
-      </div>
+      </div> */}
     </div>
   );
 }
