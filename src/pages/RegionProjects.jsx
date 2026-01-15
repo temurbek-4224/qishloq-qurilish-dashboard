@@ -100,10 +100,33 @@ export default function RegionProjects() {
             </h1>
 
             {/* SUMMARY */}
-            {!loading && filteredProjects.length > 0 && (
-                <SummaryCards summary={stats.summary} />
-            )}
 
+
+            {/* {!loading && filteredProjects.length > 0 && (
+                <SummaryCards summary={stats.summary} />
+            )} */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+                <div className="bg-white p-4 rounded-xl shadow">
+                    <p className="text-gray-500">Umumiy shartnoma</p>
+                    <p className="text-blue-600 font-bold">
+                        {stats.summary.totalContract.toLocaleString()} so'm
+                    </p>
+                </div>
+
+                <div className="bg-white p-4 rounded-xl shadow">
+                    <p className="text-gray-500">To‘langan</p>
+                    <p className="text-green-600 font-bold">
+                        {stats.summary.totalPaid.toLocaleString()} so'm
+                    </p>
+                </div>
+
+                <div className="bg-white p-4 rounded-xl shadow">
+                    <p className="text-gray-500">Qolgan</p>
+                    <p className="text-red-600 font-bold">
+                        {stats.summary.totalRemaining.toLocaleString()} so'm
+                    </p>
+                </div>
+            </div>
 
             {/* FILTER BAR */}
             <div className="bg-white rounded-xl border p-4 my-6">

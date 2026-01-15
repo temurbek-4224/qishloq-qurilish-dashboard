@@ -8,7 +8,7 @@ export default function SummaryCards({ summary = {} }) {
     totalRemaining = 0,
   } = summary;
 
-  console.log(totalContract, totalContract, totalRemaining)
+  // console.log(totalContract, totalContract, totalRemaining)
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
