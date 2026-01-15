@@ -83,7 +83,10 @@ export default function ProjectDetail() {
                     <p className="font-medium mb-4">{project.viloyat}</p>
 
                     <p className="text-sm text-gray-500 mb-1">Mas'ul shaxs</p>
-                    <p className="font-medium">{project.masul_shaxs}</p>
+                    <p className="font-medium mb-4">{project.masul_shaxs}</p>
+
+                    <p className="text-sm text-gray-500 mb-1">Telefon Raqam</p>
+                    <p className="font-medium">{project.tel_raqam}</p>
                 </div>
 
                 {/* RIGHT */}

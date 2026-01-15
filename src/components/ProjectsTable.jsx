@@ -1,5 +1,6 @@
 import { formatMoney, calcQolganSumma } from "../utils/helpers";
 import { useNavigate } from "react-router-dom";
+import { formatDate } from "../utils/helpers";
 
 
 const statusStyles = {
@@ -24,16 +25,16 @@ export default function ProjectsTable({ projects }) {
     return (
         <div className="bg-white rounded-2xl shadow border overflow-hidden mt-6">
             <div className="overflow-x-auto">
-                <table className="min-w-full text-sm">
+               <table className="min-w-full text-sm table-fixed">
 
                     <thead className="bg-gray-100 text-gray-600 sticky top-0 z-10">
                         <tr>
                             <th className="px-4 py-3 text-left">№</th>
                             <th className="px-4 py-3 text-left">Loyiha nomi</th>
                             <th className="px-4 py-3 text-left">Buyurtmachi</th>
-                            <th className="px-4 py-3 text-right">Shartnoma</th>
-                            <th className="px-4 py-3 text-right">To‘langan</th>
-                            <th className="px-4 py-3 text-right">Qolgan</th>
+                            <th className="px-4 py-3 text-left">Shartnoma raqami</th>
+                            <th className="px-4 py-3 text-left">Boshlangan sana</th>
+                            {/* <th className="px-4 py-3 text-right">Objectlar soni</th> */}
                             <th className="px-4 py-3 text-center">Holati</th>
                         </tr>
                     </thead>
@@ -62,15 +63,15 @@ export default function ProjectsTable({ projects }) {
                                         {p.buyurtmachi}
                                     </div>
                                 </td>
-                                <td className="px-4 py-3 text-right font-medium">
-                                    {formatMoney(p.shartnoma_summa)}
+                                <td className="px-4 py-3 font-medium">
+                                    {p.shartnoma_raqam || "-"}
                                 </td>
-                                <td className="px-4 py-3 text-right text-green-600">
-                                    {formatMoney(p.tolangan_summa)}
+                                <td className="px-4 py-3">
+                                    {formatDate(p.boshlanish_sana)}
                                 </td>
-                                <td className="px-4 py-3 text-right text-red-600">
-                                    {formatMoney(calcQolganSumma(p.shartnoma_summa, p.tolangan_summa))}
-                                </td>
+                                {/* <td className="px-4 py-3 text-center font-semibold">
+                                    {p.object_soni ?? 0}
+                                </td> */}
                                 <td className="px-4 py-3 text-center">
                                     <span
                                         className={`px-3 py-1 rounded-full text-xs font-semibold whitespace-nowrap ${statusStyles[p.object_holati]}`}

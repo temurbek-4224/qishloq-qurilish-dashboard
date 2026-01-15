@@ -36,3 +36,21 @@ export function truncate(text, max = 60) {
   return text.length > max ? text.slice(0, max) + "…" : text;
 }
 
+export function formatDate(dateStr) {
+  if (!dateStr) return "-";
+
+  // ISO format
+  if (dateStr.includes("T")) {
+    return new Date(dateStr).toISOString().split("T")[0];
+  }
+
+  // DD/MM/YYYY format
+  if (dateStr.includes("/")) {
+    const [day, month, year] = dateStr.split("/");
+    return `${year}-${month}-${day}`;
+  }
+
+  return "-";
+}
+
+
