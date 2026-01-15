@@ -1,9 +1,14 @@
-export default function SummaryCards({ stats }) {
+export default function SummaryCards({ summary = {} }) {
+
+  if (!summary) return null;
+  
   const {
     totalContract = 0,
     totalPaid = 0,
     totalRemaining = 0,
-  } = stats || {};
+  } = summary;
+
+  console.log(totalContract, totalContract, totalRemaining)
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">

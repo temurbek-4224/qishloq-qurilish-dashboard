@@ -1,83 +1,92 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
 import { getProjects } from "../services/api";
-import { formatMoney } from "../utils/helpers";
-import { calculateProjectsStats } from "../utils/projectsStats";
 import SummaryCards from "../components/SummaryCards";
 import RegionCards from "../components/RegionCards";
-
-
-const statusStyles = {
-  Shartnoma: "bg-blue-100 text-blue-700",
-  Loyihalash: "bg-indigo-100 text-indigo-700",
-  Expertiza: "bg-orange-100 text-orange-700",
-  Topshirildi: "bg-green-100 text-green-700",
-};
+import ProjectsTable from "../components/ProjectsTable";
+import { calculateProjectsStats } from "../utils/projectsStats";
 
 export default function Projects() {
+  // DATA
   const [projects, setProjects] = useState([]);
+
+  // FILTER STATES
   const [search, setSearch] = useState("");
   const [status, setStatus] = useState("");
   const [selectedRegion, setSelectedRegion] = useState("ALL");
 
-
+  // API
   useEffect(() => {
-    getProjects().then(setProjects);
+    getProjects().then((res) => {
+      setProjects(res || []);
+    });
   }, []);
 
-  const stats = calculateProjectsStats(projects);
+  // 1️⃣ SEARCH + STATUS FILTER
+  const filteredBySearchAndStatus = useMemo(() => {
+    return projects.filter((p) => {
+      const matchesSearch =
+        p.loyiha_nomi?.toLowerCase().includes(search.toLowerCase());
 
-  // console.log(stats);
+      const matchesStatus = status
+        ? p.object_holati === status
+        : true;
 
-  const filtered = projects.filter((p) => {
-    const byName = p.loyiha_nomi
-      ?.toLowerCase()
-      .includes(search.toLowerCase());
+      return matchesSearch && matchesStatus;
+    });
+  }, [projects, search, status]);
 
-    const byStatus = status ? p.object_holati === status : true;
+  // 2️⃣ REGION FILTER
+  const filteredProjects = useMemo(() => {
+    if (selectedRegion === "ALL") return filteredBySearchAndStatus;
 
-    return byName && byStatus;
-  });
+    return filteredBySearchAndStatus.filter(
+      (p) => p.viloyat === selectedRegion
+    );
+  }, [filteredBySearchAndStatus, selectedRegion]);
 
-  const filteredProjects =
-    selectedRegion === "ALL"
-      ? projects
-      : projects.filter(p => p.viloyat === selectedRegion);
+  // 3️⃣ STATS
+  const statsAll = useMemo(
+    () => calculateProjectsStats(projects),
+    [projects]
+  );
 
-  const statsFiltered = calculateProjectsStats(filteredProjects);
-
+  const statsFiltered = useMemo(
+    () => calculateProjectsStats(filteredProjects),
+    [filteredProjects]
+  );
 
   return (
     <div className="p-6 bg-gray-100 min-h-screen">
-      {/* HEADER */}
-      <div className="mb-6">
-        <h1 className="text-2xl font-bold text-gray-800 mb-4">
-          Loyihalar
-        </h1>
+      {/* TITLE */}
+      <h1 className="text-2xl font-bold mb-6">Loyihalar</h1>
 
-        {/* 🔥 1. SUMMARY CARDLAR — ENG TEPADA */}
-        <SummaryCards summary={stats.summary} />
-        <RegionCards
-          regions={stats.regions}
-          selected={selectedRegion}
-          onSelect={setSelectedRegion}
-        />
+      {/* SUMMARY */}
+      <SummaryCards summary={statsFiltered.summary} />
 
-        {/* search + filter */}
-        {/* <div className="flex flex-col md:flex-row gap-3">
+      {/* REGIONS */}
+      <RegionCards
+        regions={statsAll.regions}
+        selected={selectedRegion}
+        onSelect={setSelectedRegion}
+      />
+
+      {/* FILTER BAR */}
+      <div className="bg-white rounded-xl border border-gray-200 p-4 mb-4">
+        <div className="flex flex-col md:flex-row gap-3">
+          {/* SEARCH */}
           <input
             type="text"
-            placeholder="🔍 Loyiha nomi bo‘yicha qidirish..."
-            className="w-full md:w-96 px-4 py-2 rounded-lg border border-gray-300
-                       focus:outline-none focus:ring-2 focus:ring-indigo-500"
+            placeholder="Loyiha nomi bo‘yicha qidirish"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
+            className="flex-1 px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-indigo-500 outline-none"
           />
 
+          {/* STATUS */}
           <select
-            className="w-full md:w-56 px-4 py-2 rounded-lg border border-gray-300
-                       focus:outline-none focus:ring-2 focus:ring-indigo-500"
             value={status}
             onChange={(e) => setStatus(e.target.value)}
+            className="md:w-56 px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-indigo-500 outline-none"
           >
             <option value="">Barcha holatlar</option>
             <option value="Shartnoma">Shartnoma</option>
@@ -85,86 +94,13 @@ export default function Projects() {
             <option value="Expertiza">Expertiza</option>
             <option value="Topshirildi">Topshirildi</option>
           </select>
-        </div> */}
+        </div>
       </div>
 
-      {/* TABLE CARD */}
-      {/* <div className="bg-white rounded-2xl shadow border border-gray-200 overflow-hidden">
-        <div className="overflow-x-auto">
-          <table className="min-w-full text-sm">
-            <thead className="bg-gray-100 text-gray-600 sticky top-0">
-              <tr className="text-xs uppercase">
-                <th className="px-4 py-3 text-left">№</th>
-                <th className="px-4 py-3 text-left">Loyiha nomi</th>
-                <th className="px-4 py-3">Viloyat</th>
-                <th className="px-4 py-3">Buyurtmachi</th>
-                <th className="px-4 py-3 text-right">Shartnoma</th>
-                <th className="px-4 py-3 text-right">To‘langan</th>
-                <th className="px-4 py-3 text-right">Qolgan</th>
-                <th className="px-4 py-3 text-center">Holati</th>
-              </tr>
-            </thead>
-
-            <tbody>
-              {filtered.map((p, i) => {
-                const qolgan =
-                  (p.shartnoma_summa || 0) -
-                  (p.tolangan_summa || 0);
-
-                return (
-                  <tr
-                    key={p.id}
-                    className="border-t even:bg-gray-50 hover:bg-indigo-50 transition"
-                  >
-                    <td className="px-4 py-3">{i + 1}</td>
-
-                    <td className="px-4 py-3 max-w-[360px]">
-                      <span
-                        className="block truncate"
-                        title={p.loyiha_nomi}
-                      >
-                        {p.loyiha_nomi}
-                      </span>
-                    </td>
-
-                    <td className="px-4 py-3">{p.viloyat}</td>
-
-                    <td className="px-4 py-3 max-w-[240px] truncate">
-                      {p.buyurtmachi}
-                    </td>
-
-                    <td className="px-4 py-3 text-right font-medium">
-                      {formatMoney(p.shartnoma_summa)}
-                    </td>
-
-                    <td className="px-4 py-3 text-right text-green-600 font-medium">
-                      {formatMoney(p.tolangan_summa)}
-                    </td>
-
-                    <td
-                      className={`px-4 py-3 text-right font-semibold ${qolgan > 0
-                        ? "text-red-600"
-                        : "text-gray-400"
-                        }`}
-                    >
-                      {formatMoney(qolgan)}
-                    </td>
-
-                    <td className="px-4 py-3 text-center">
-                      <span
-                        className={`px-3 py-1 rounded-full text-xs font-semibold ${statusStyles[p.object_holati]
-                          }`}
-                      >
-                        {p.object_holati}
-                      </span>
-                    </td>
-                  </tr>
-                );
-              })}
-            </tbody>
-          </table>
-        </div>
-      </div> */}
+      {/* TABLE */}
+      <div className="bg-white rounded-xl shadow border border-gray-200 overflow-hidden">
+        <ProjectsTable projects={filteredProjects} />
+      </div>
     </div>
   );
 }

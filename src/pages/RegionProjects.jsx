@@ -16,6 +16,8 @@ export default function RegionProjects() {
     const [search, setSearch] = useState("");
     const [status, setStatus] = useState("");
     const [showCalendar, setShowCalendar] = useState(false);
+    const [loading, setLoading] = useState(true);
+
 
 
     // ✅ DATE RANGE STATE — TO‘G‘RI JOYDA
@@ -31,34 +33,65 @@ export default function RegionProjects() {
         getProjects().then(setProjects);
     }, []);
 
+    useEffect(() => {
+        getProjects().then((data) => {
+            setProjects(data);
+            setLoading(false);
+        });
+    }, []);
+
+
+    // const regionProjects = useMemo(() => {
+    //     return projects.filter(p => p.viloyat === region);
+    // }, [projects, region]);
+
+
     // ✅ FILTER + SEARCH + STATUS + DATE
     const filteredProjects = useMemo(() => {
-        return projects.filter((p) => {
+        return projects.filter(p => {
             // region
             if (p.viloyat !== region) return false;
 
-            // search
-            const matchesSearch = p.loyiha_nomi
+            // search (SAFE)
+            const name = p.loyiha_nomi || "";
+            const matchesSearch = name
                 .toLowerCase()
                 .includes(search.toLowerCase());
 
             // status
-            const matchesStatus = !status || p.object_holati === status;
+            const matchesStatus = status
+                ? p.object_holati === status
+                : true;
 
-            // date range
-            const projectDate = new Date(p.boshlanish_sana);
-            const { startDate, endDate } = dateRange[0];
-
-            const matchesDate =
-                (!startDate || projectDate >= startDate) &&
-                (!endDate || projectDate <= endDate);
+            // date range (SAFE)
+            let matchesDate = true;
+            if (dateRange?.[0]?.startDate && dateRange?.[0]?.endDate) {
+                const projectDate = new Date(p.boshlanish_sana);
+                matchesDate =
+                    projectDate >= dateRange[0].startDate &&
+                    projectDate <= dateRange[0].endDate;
+            }
 
             return matchesSearch && matchesStatus && matchesDate;
         });
     }, [projects, region, search, status, dateRange]);
 
+    // console.log("region:", region);
+    // console.log("projects:", projects.length);
+    // console.log("filtered:", filteredProjects.length);
+
+
+
+
+
     // ✅ STATISTICS FAQAT FILTERED DATA BO‘YICHA
-    const stats = calculateProjectsStats(filteredProjects);
+    // const stats = calculateProjectsStats(filteredProjects);
+
+    const stats = useMemo(() => {
+        return calculateProjectsStats(filteredProjects);
+    }, [filteredProjects]);
+
+    // console.log("STATS:", stats);
 
     return (
         <div>
@@ -67,7 +100,10 @@ export default function RegionProjects() {
             </h1>
 
             {/* SUMMARY */}
-            <SummaryCards stats={stats.summary} />
+            {!loading && filteredProjects.length > 0 && (
+                <SummaryCards summary={stats.summary} />
+            )}
+
 
             {/* FILTER BAR */}
             <div className="bg-white rounded-xl border p-4 my-6">
