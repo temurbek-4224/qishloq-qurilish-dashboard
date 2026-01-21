@@ -11,7 +11,7 @@ export default function App() {
       <Layout>
         <Routes>
           <Route path="/" element={<Dashboard />} />
-          <Route path="/projects" element={<Projects />} />
+          <Route path="/loyihalar" element={<Projects />} />
           <Route
             path="/loyihalar/:region"
             element={<RegionProjects />}

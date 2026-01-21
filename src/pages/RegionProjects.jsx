@@ -1,9 +1,10 @@
-import { useParams } from "react-router-dom";
+import { useParams, useSearchParams } from "react-router-dom";
 import { useEffect, useState, useMemo } from "react";
 import { getProjects } from "../services/api";
 import { calculateProjectsStats } from "../utils/projectsStats";
 import SummaryCards from "../components/SummaryCards";
 import ProjectsTable from "../components/ProjectsTable";
+import { isDelayedProject } from "../utils/helpers";
 
 import { DateRange } from "react-date-range";
 import "react-date-range/dist/styles.css";
@@ -17,6 +18,8 @@ export default function RegionProjects() {
     const [status, setStatus] = useState("");
     const [showCalendar, setShowCalendar] = useState(false);
     const [loading, setLoading] = useState(true);
+    const [searchParams] = useSearchParams();
+    const filter = searchParams.get("filter"); // "delayed" bo‘ladi
 
 
 
@@ -48,9 +51,14 @@ export default function RegionProjects() {
 
     // ✅ FILTER + SEARCH + STATUS + DATE
     const filteredProjects = useMemo(() => {
+
         return projects.filter(p => {
             // region
             if (p.viloyat !== region) return false;
+
+            if (filter === "delayed" && !isDelayedProject(p)) {
+                return false;
+            }
 
             // search (SAFE)
             const name = p.loyiha_nomi || "";
@@ -71,10 +79,11 @@ export default function RegionProjects() {
                     projectDate >= dateRange[0].startDate &&
                     projectDate <= dateRange[0].endDate;
             }
+            // 5️⃣ 🔥 DELAYED FILTER
 
             return matchesSearch && matchesStatus && matchesDate;
         });
-    }, [projects, region, search, status, dateRange]);
+    }, [projects, region, search, status, dateRange, filter]);
 
     // console.log("region:", region);
     // console.log("projects:", projects.length);

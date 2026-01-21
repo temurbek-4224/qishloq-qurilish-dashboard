@@ -1,7 +1,7 @@
 import { useNavigate } from "react-router-dom";
 import { formatMoney } from "../utils/helpers";
 
-export default function RegionCards({ regions }) {
+export default function RegionCards({ regions = {}, delayedOnly = false }) {
   const navigate = useNavigate();
 
   return (
@@ -9,7 +9,11 @@ export default function RegionCards({ regions }) {
       {Object.entries(regions).map(([region, data]) => (
         <div
           key={region}
-          onClick={() => navigate(`/loyihalar/${region}`)}
+          onClick={() => navigate(
+            delayedOnly
+              ? `/loyihalar/${region}?filter=delayed`
+              : `/loyihalar/${region}`
+          )}
           className="cursor-pointer bg-white rounded-xl shadow-sm border
                      hover:shadow-md hover:border-indigo-400
                      transition p-5 flex items-center justify-between"

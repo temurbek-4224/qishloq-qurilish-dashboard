@@ -9,11 +9,11 @@ export function countProjects(projects) {
   return projects.length;
 }
 
-export function countDelayedProjects(projects) {
-  return projects.filter(
-    (p) => p.object_holati === "Expertiza"
-  ).length;
-}
+// export function countDelayedProjects(projects) {
+//   return projects.filter(
+//     (p) => p.object_holati === "Expertiza"
+//   ).length;
+// }
 
 export function countByStatus(projects) {
   return projects.reduce((acc, p) => {
@@ -51,6 +51,52 @@ export function formatDate(dateStr) {
   }
 
   return "-";
+}
+
+// 🔒 SANA XAVFSIZ PARSE
+export function parseDateSafe(dateStr) {
+  if (!dateStr) return null;
+
+  // ISO yoki YYYY-MM-DD
+  if (dateStr.includes("-")) {
+    const d = new Date(dateStr);
+    return isNaN(d) ? null : d;
+  }
+
+  // DD/MM/YYYY yoki MM/DD/YYYY
+  if (dateStr.includes("/")) {
+    const parts = dateStr.split("/");
+    if (parts.length !== 3) return null;
+
+    // agar oxiri 4 xonali bo‘lsa — YYYY
+    const year = parts[2];
+    const month = parts[1];
+    const day = parts[0];
+
+    const d = new Date(`${year}-${month}-${day}`);
+    return isNaN(d) ? null : d;
+  }
+
+  return null;
+}
+
+// ⏰ BITTA LOYIHA KECHIKKANMI?
+export function isDelayedProject(project) {
+  const today = new Date();
+
+  const deadline = parseDateSafe(project.muddat_sana);
+  if (!deadline) return false;
+
+  // ❗ faqat sana bilan solishtiramiz
+  today.setHours(0, 0, 0, 0);
+  deadline.setHours(0, 0, 0, 0);
+
+  return today > deadline;
+}
+
+// 🔢 HAMMASIDAN NECHTASI KECHIKKAN
+export function countDelayedProjects(projects = []) {
+  return projects.filter(isDelayedProject).length;
 }
 
 

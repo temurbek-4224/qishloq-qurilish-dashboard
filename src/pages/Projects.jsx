@@ -4,6 +4,8 @@ import SummaryCards from "../components/SummaryCards";
 import RegionCards from "../components/RegionCards";
 import ProjectsTable from "../components/ProjectsTable";
 import { calculateProjectsStats } from "../utils/projectsStats";
+import { isDelayedProject } from "../utils/helpers";
+import { useSearchParams } from "react-router-dom";
 
 export default function Projects() {
   // DATA
@@ -13,6 +15,9 @@ export default function Projects() {
   const [search, setSearch] = useState("");
   const [status, setStatus] = useState("");
   const [selectedRegion, setSelectedRegion] = useState("ALL");
+  const [searchParams] = useSearchParams();
+  const delayedOnly = searchParams.get("filter") === "delayed";
+
 
   // API
   useEffect(() => {
@@ -31,9 +36,15 @@ export default function Projects() {
         ? p.object_holati === status
         : true;
 
-      return matchesSearch && matchesStatus;
+      const matchesDelayed = delayedOnly
+        ? isDelayedProject(p)
+        : true;
+
+      return matchesSearch && matchesStatus && matchesDelayed;
     });
-  }, [projects, search, status]);
+  }, [projects, search, status, delayedOnly]);
+
+
 
   // 2️⃣ REGION FILTER
   const filteredProjects = useMemo(() => {
@@ -65,15 +76,16 @@ export default function Projects() {
 
       {/* REGIONS */}
       <RegionCards
-        regions={statsAll.regions}
+        regions={delayedOnly ? statsFiltered.regions : statsAll.regions}
         selected={selectedRegion}
         onSelect={setSelectedRegion}
+        delayedOnly={delayedOnly}
       />
 
-      {/* FILTER BAR */}
+      {/* FILTER BAR 
       <div className="bg-white rounded-xl border border-gray-200 p-4 mb-4">
         <div className="flex flex-col md:flex-row gap-3">
-          {/* SEARCH */}
+          
           <input
             type="text"
             placeholder="Loyiha nomi bo‘yicha qidirish"
@@ -82,7 +94,7 @@ export default function Projects() {
             className="flex-1 px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-indigo-500 outline-none"
           />
 
-          {/* STATUS */}
+          
           <select
             value={status}
             onChange={(e) => setStatus(e.target.value)}
@@ -97,10 +109,12 @@ export default function Projects() {
         </div>
       </div>
 
+      */}
+
       {/* TABLE */}
-      <div className="bg-white rounded-xl shadow border border-gray-200 overflow-hidden">
+      {/* <div className="bg-white rounded-xl shadow border border-gray-200 overflow-hidden">
         <ProjectsTable projects={filteredProjects} />
-      </div>
+      </div> */}
     </div>
   );
 }

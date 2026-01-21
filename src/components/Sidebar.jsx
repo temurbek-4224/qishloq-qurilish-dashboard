@@ -18,7 +18,7 @@ function Sidebar() {
         </NavLink>
 
         <NavLink
-          to="/projects"
+          to="/loyihalar"
           className={({ isActive }) =>
             `block px-4 py-2 rounded ${
               isActive ? "bg-blue-600 text-white" : "hover:bg-gray-100"

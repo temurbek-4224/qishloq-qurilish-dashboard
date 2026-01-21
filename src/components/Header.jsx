@@ -18,7 +18,7 @@ function Header() {
                     Dashboard
                 </Link>
 
-                <Link to="/projects" className={linkClass("/projects")}>
+                <Link to="/loyihalar" className={linkClass("/loyihalar")}>
                     Loyihalar
                 </Link>
             </div>
