@@ -5,7 +5,7 @@ import { calculateProjectsStats } from "../utils/projectsStats";
 import SummaryCards from "../components/SummaryCards";
 import ProjectsTable from "../components/ProjectsTable";
 import { isDelayedProject } from "../utils/helpers";
-
+import { exportProjectsToExcel } from "../utils/exportToExcel";
 import { DateRange } from "react-date-range";
 import "react-date-range/dist/styles.css";
 import "react-date-range/dist/theme/default.css";
@@ -216,6 +216,22 @@ export default function RegionProjects() {
                             </div>
                         )}
                     </div>
+
+                    {/* yuklab olish */}
+
+                    <button
+                        onClick={() => {
+                            console.log("EXPORT CLICKED", filteredProjects.length);
+                            exportProjectsToExcel(
+                                filteredProjects,
+                                `${region}_loyihalar.xlsx`
+                            );
+                        }}
+                        className="ml-auto px-4 py-2 rounded-lg bg-green-600 text-white
+             hover:bg-green-700 text-sm"
+                    >
+                        ⬇️ Excelga yuklab olish
+                    </button>
 
                 </div>
             </div>
